@@ -33,5 +33,8 @@ unique(homicides$city)
 I think it would be fun to use Baton Rouge. Next, I'm going to create an object containing just the observations for Baton Rouge. 
 
 ```{r}
-
+baton_rouge <- homicides %>% 
+  filter(city == "Baton Rouge") 
+baton_rouge %>% 
+  slice(1:3)
 ```
