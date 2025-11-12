@@ -1,0 +1,14 @@
+---
+title: "Homework 5" 
+author: "Ainsley Lotito" 
+date: "November 12, 2025" 
+output: html_document 
+--- 
+
+# Looking at the `data` subdirectory 
+
+*Write a piece of code that lists the files you saved in the `data` subdirectory.* 
+
+```{r}
+list.files("../data")
+```
