@@ -70,6 +70,7 @@ baton_rouge <- baton_rouge %>%
 baton_rouge %>% 
   slice(1:3)
 
+range(baton_rouge$reported_date)
 ```
 Lastly, I need save as an sf object so I can plot this on a map.
 
@@ -83,7 +84,10 @@ dim(baton_rouge_sf)
 ```
 
 Making a map of baton rouge. I need to pull some tracts, block groups, and county subdivisions from tigris. 
-The FIPS code for East Baton Rouge Parish is 22033, and West is 22121. I can therefore select by the countyFP of 033 and 121.
+The FIPS code for East Baton Rouge Parish is 22033, and West is 22121. I can therefore select by the countyFP of 033 and 121. 
+I am going to start by just making a base map of Baton Rouge before I add my homicide data. 
+
+
 
 ```{r}
 library(tigris)
@@ -99,11 +103,45 @@ ba_subdivisions <- county_subdivisions("LA", county = c("033", "121"))
 
 ggplot() +
   geom_sf(data = ba_subdivisions, fill = NA, color = "black", size = 0.7) + #subdivisions
-  geom_sf(data = ba_tracts, fill = "white", color = "gray60", size = 0.3) + #tracts
-  geom_sf(data = ba_blocks, fill = NA, color = "gray85", size = 0.1) + #blocks
-  geom_sf(data = baton_rouge_sf, aes(color = disposition), size = 2) +
+  geom_sf(data = ba_tracts, fill = "white", color = "gray", size = 0.3) + #tracts
+  geom_sf(data = ba_blocks, fill = NA, color = "lightgray", size = 0.1) + #blocks
+  theme_minimal() + 
+  labs(title = "Baton Rouge, Louisiana")   
+
+### Need to cite and explain what this is doing ##
+ba_subdivisions$layer <- "Subdivisions"
+ba_tracts$layer       <- "Tracts"
+ba_blocks$layer       <- "Blocks"
+
+ggplot() +
+  geom_sf(data = ba_subdivisions, 
+          aes(color = layer), fill = NA, size = 0.7) +
+  geom_sf(data = ba_tracts, 
+          aes(color = layer), fill = "white", size = 0.3) +
+  geom_sf(data = ba_blocks, 
+          aes(color = layer), fill = NA, size = 0.1) +
+  scale_color_manual(values = c(
+    "Subdivisions" = "black",
+    "Tracts"       = "gray60",
+    "Blocks"       = "gray85"
+  )) +
+  labs(title = "Baton Rouge, Louisiana",
+       color = "Geography Layer") +
   theme_minimal()
 
-``` 
+```  
 
-fct_relevel the disposition and other attributes, relabel for graph
+
+Now that I have a good basemap, I can look into adding some homicide info. 
+The first map is going to just show the locations of each homicide. 
+```{r}
+ggplot() +
+  geom_sf(data = ba_subdivisions, fill = NA, color = "black", size = 0.7) + #subdivisions
+  geom_sf(data = ba_tracts, fill = "white", color = "gray60", size = 0.3) + #tracts
+  geom_sf(data = ba_blocks, fill = NA, color = "gray85", size = 0.1) + #blocks
+  geom_sf(data = baton_rouge_sf, color = "darkred", size = 0.9, alpha = .6) +
+  theme_minimal() + 
+  xlim(c(-91.22, -90.97)) + ylim(c(30.38, 30.57)) + #zooming in to points 
+  labs(title = "Homicides in Baton Rouge, LA",
+       subtitle = "Jan 3, 2011 - Dec 31, 2017")
+```
