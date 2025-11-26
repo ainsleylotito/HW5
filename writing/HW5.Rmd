@@ -52,12 +52,17 @@ The FIPS code for East Baton Rouge Parish is 22033, and West is 22121. I can the
 
 ```{r}
 library(tigris)
-la_tracts <- tracts(state = "LA", year = 2023) 
+la_tracts <- tracts(state = "LA", year = 2023) #tracts first
 ba_tracts <- la_tracts %>% 
-  filter(COUNTYFP %in% c("033", "121"))
+  filter(COUNTYFP %in% c("033", "121")) 
+
+la_blocks <- block_groups(state = "LA", year = 2023)
+ba_blocks<- la_blocks %>% 
+  filter(COUNTYFP %in% c("033", "121")) 
 
 ggplot() +
-  geom_sf(data = ba_tracts, fill = NA, color = "black") +
-  labs(title = "Census Tracts))
+  geom_sf(data = ba_tracts, fill = NA, color = "black") + # Census Tracts
+  geom_sf(data= ba_blocks, fill = NA, color = "gray") + # Census Blocks
+  geom_sf(data = baton_rouge_sf, aes(color= disposition))
 
 ```
