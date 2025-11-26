@@ -36,5 +36,20 @@ I think it would be fun to use Baton Rouge. Next, I'm going to create an object 
 baton_rouge <- homicides %>% 
   filter(city == "Baton Rouge") 
 baton_rouge %>% 
-  slice(1:3)
+  slice(1:3)   
+```
+
+Making a map of baton rouge. I need to pull some tracts, block groups, and county subdivisions from tigris. 
+The FIPS code for East Baton Rouge Parish is 22033, and West is 22121. I can therefore select by the countyFP of 033 and 121.
+
+```{r}
+library(tigris)
+la_tracts <- tracts(state = "LA", year = 2023) 
+ba_tracts <- la_tracts %>% 
+  filter(COUNTYFP %in% c("033", "121"))
+
+ggplot() +
+  geom_sf(data = ba_tracts, fill = NA, color = "black") +
+  labs(title = "Census Tracts)
+
 ```
