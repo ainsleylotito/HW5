@@ -21,10 +21,11 @@ list.files("../data")
 
 To start off, let's read in the data and take a look at the cities we may choose from. 
 
-```{r}
+```{r, results = FALSE, warning = FALSE, message = FALSE}
 library(tidyverse)
 library(forcats)
-library(tigris)
+library(tigris) 
+library(labelled)
 
 homicides <- read.csv("../data/homicide-data.csv") 
 unique(homicides$city)
@@ -88,7 +89,7 @@ The FIPS code for East Baton Rouge Parish is 22033, and West is 22121. I can the
 I am going to start by just making a base map of Baton Rouge before I add my homicide data. 
 
 
-```{r}
+```{r, message= FALSE, results = FALSE}
 library(tigris)
 la_tracts <- tracts(state = "LA") #tracts first
 ba_tracts <- la_tracts %>% 
@@ -99,7 +100,9 @@ ba_blocks<- la_blocks %>%
   filter(COUNTYFP %in% c("033", "121"))  
 
 ba_subdivisions <- county_subdivisions("LA", county = c("033", "121"))
+```
 
+```{r}
 ggplot() +
   geom_sf(data = ba_subdivisions, fill = NA, color = "black", size = 0.7) + #subdivisions
   geom_sf(data = ba_tracts, fill = "white", color = "gray", size = 0.3) + #tracts
@@ -107,32 +110,12 @@ ggplot() +
   theme_minimal() + 
   labs(title = "Baton Rouge, Louisiana")   
 
-### Need to cite and explain what this is doing ##
-ba_subdivisions$layer <- "Subdivisions"
-ba_tracts$layer       <- "Tracts"
-ba_blocks$layer       <- "Blocks"
-
-ggplot() +
-  geom_sf(data = ba_subdivisions, 
-          aes(color = layer), fill = NA, size = 0.7) +
-  geom_sf(data = ba_tracts, 
-          aes(color = layer), fill = "white", size = 0.3) +
-  geom_sf(data = ba_blocks, 
-          aes(color = layer), fill = NA, size = 0.1) +
-  scale_color_manual(values = c(
-    "Subdivisions" = "black",
-    "Tracts"       = "gray60",
-    "Blocks"       = "gray85"
-  )) +
-  labs(title = "Baton Rouge, Louisiana",
-       color = "Geography Layer") +
-  theme_minimal()
-
 ```  
 
 
-Now that I have a good basemap, I can look into adding some homicide info. 
+Now that I have a basemap, I can look into adding some homicide info. 
 The first map is going to just show the locations of each homicide. 
+
 ```{r}
 ggplot() +
   geom_sf(data = ba_subdivisions, fill = NA, color = "black", size = 0.7) + #subdivisions
@@ -146,14 +129,19 @@ ggplot() +
 ``` 
 
 Next we are going to look at solved versus unsolved homicides, and use different colors for the three race groups with the highest number of homicides. I also got some errors and found that I will need to use the command inherit.aes = FALSE for each sf layer without the case_status faceting variable (all the geography ones)
-```{r}
+```{r, fig.width = 9, fig.height=6}
 top3_races <- baton_rouge_sf %>% 
   group_by(victim_race) %>% 
   count() %>% 
   slice(1:3)  
 
 baton_rouge_sf_top3 <- baton_rouge_sf %>% 
-  filter(victim_race %in% top3_races$victim_race)
+  filter(victim_race %in% top3_races$victim_race) %>% 
+  set_variable_labels(
+    victim_race = "Racial Group of Victim"
+  )
+
+
 
 ggplot() +
   geom_sf(data = ba_subdivisions, fill = NA, color = "black", size = 0.7,
@@ -163,7 +151,7 @@ ggplot() +
   geom_sf(data = ba_blocks, fill = NA, color = "gray85", size = 0.1,
           inherit.aes = FALSE) + #blocks
   
-  geom_sf(data = baton_rouge_sf_top3, aes(color = race_group), size = 0.9, alpha = .6) +
+  geom_sf(data = baton_rouge_sf_top3, aes(color = victim_race), size = 0.9, alpha = .6) +
   facet_wrap(~ case_status)+
   theme_minimal() + 
   xlim(c(-91.22, -90.97)) + ylim(c(30.38, 30.57)) + #zooming in to points 
