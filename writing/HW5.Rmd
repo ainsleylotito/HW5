@@ -88,7 +88,6 @@ The FIPS code for East Baton Rouge Parish is 22033, and West is 22121. I can the
 I am going to start by just making a base map of Baton Rouge before I add my homicide data. 
 
 
-
 ```{r}
 library(tigris)
 la_tracts <- tracts(state = "LA") #tracts first
@@ -144,4 +143,30 @@ ggplot() +
   xlim(c(-91.22, -90.97)) + ylim(c(30.38, 30.57)) + #zooming in to points 
   labs(title = "Homicides in Baton Rouge, LA",
        subtitle = "Jan 3, 2011 - Dec 31, 2017")
+``` 
+
+Next we are going to look at solved versus unsolved homicides, and use different colors for the three race groups with the highest number of homicides. I also got some errors and found that I will need to use the command inherit.aes = FALSE for each sf layer without the case_status faceting variable (all the geography ones)
+```{r}
+top3_races <- baton_rouge_sf %>% 
+  group_by(victim_race) %>% 
+  count() %>% 
+  slice(1:3)  
+
+baton_rouge_sf_top3 <- baton_rouge_sf %>% 
+  filter(victim_race %in% top3_races$victim_race)
+
+ggplot() +
+  geom_sf(data = ba_subdivisions, fill = NA, color = "black", size = 0.7,
+          inherit.aes = FALSE) + #subdivisions
+  geom_sf(data = ba_tracts, fill = "white", color = "gray60", size = 0.3,
+          inherit.aes = FALSE) + #tracts
+  geom_sf(data = ba_blocks, fill = NA, color = "gray85", size = 0.1,
+          inherit.aes = FALSE) + #blocks
+  
+  geom_sf(data = baton_rouge_sf_top3, aes(color = race_group), size = 0.9, alpha = .6) +
+  facet_wrap(~ case_status)+
+  theme_minimal() + 
+  xlim(c(-91.22, -90.97)) + ylim(c(30.38, 30.57)) + #zooming in to points 
+  labs(title = "Homicides in Baton Rouge 2011 - 2017",
+       subtitle = "By Racial Group and Case Status")
 ```
