@@ -1,8 +1,10 @@
 ---
-title: "Homework 5" 
-author: "Ainsley Lotito" 
-date: "November 12, 2025" 
-output: html_document 
+title: "Homework 5"
+author: "Ainsley Lotito"
+date: "November 12, 2025"
+output:
+  pdf_document: default
+  html_document: default
 --- 
 
 # Looking at the `data` subdirectory 
@@ -31,24 +33,27 @@ homicides <- read.csv("../data/homicide-data.csv")
 unique(homicides$city)
 ```
 
-I think it would be fun to use Baton Rouge, so I am  going to create an object containing just the observations for Baton Rouge and briefly explore the data. 
+I think it would be fun to use Baton Rouge, so I am  going to create an object containing just the observations for Baton Rouge.
 
 ```{r}
 baton_rouge <- homicides %>% 
   filter(city == "Baton Rouge")  
 dim(baton_rouge)
 baton_rouge %>% 
-  slice(1:3)   
+  slice(1:3)
+``` 
+
+```{r, echo = FALSE}
 
 table(baton_rouge$victim_race)
 table(baton_rouge$victim_sex) 
 table(baton_rouge$victim_age) #need to handle "Unknown"
+unique(baton_rouge$disposition) #looking through the levels of disposition
 ``` 
 I have data on 424 homicides in Baton Rouge, with 12 columns which include identifying information (the id, victim name, race, age, sex), the latitude and longitude, and the disposition. I need to do some data cleaning to re-categorize some variables, and to determine whether the case is solved vs. unsolved.  
 
 ```{r}
-unique(baton_rouge$disposition) #looking through the levels of disposition
-  
+
 baton_rouge <- baton_rouge %>% 
     mutate(reported_date = ymd(reported_date),
            
@@ -71,11 +76,10 @@ baton_rouge <- baton_rouge %>%
 baton_rouge %>% 
   slice(1:3)
 
-range(baton_rouge$reported_date)
 ```
 Lastly, I need save as an sf object so I can plot this on a map.
 
-```{r}
+```{r, message = FALSE, results = FALSE}
 #changing to an sf object  
 library(sf)
 baton_rouge_sf <- st_as_sf(baton_rouge, coords = c("lon", "lat")) %>% 
@@ -140,7 +144,6 @@ baton_rouge_sf_top3 <- baton_rouge_sf %>%
   set_variable_labels(
     victim_race = "Racial Group of Victim"
   )
-
 
 
 ggplot() +
