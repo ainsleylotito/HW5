@@ -151,10 +151,12 @@ ggplot() +
   geom_sf(data = ba_blocks, fill = NA, color = "gray85", size = 0.1,
           inherit.aes = FALSE) + #blocks
   
-  geom_sf(data = baton_rouge_sf_top3, aes(color = victim_race), size = 0.9, alpha = .6) +
+  geom_sf(data = baton_rouge_sf_top3, aes(color = victim_race), size = 1.1, alpha = .6) +
   facet_wrap(~ case_status)+
   theme_minimal() + 
   xlim(c(-91.22, -90.97)) + ylim(c(30.38, 30.57)) + #zooming in to points 
   labs(title = "Homicides in Baton Rouge 2011 - 2017",
-       subtitle = "By Racial Group and Case Status")
+       subtitle = "By Racial Group and Case Status")+ 
+  theme(plot.title = element_text(hjust = 0.5), 
+        plot.subtitle = element_text(hjust = 0.5))
 ```
