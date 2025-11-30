@@ -2,9 +2,7 @@
 title: "Homework 5"
 author: "Ainsley Lotito"
 date: "November 12, 2025"
-output:
-  pdf_document: default
-  html_document: default
+output: pdf_document
 --- 
 
 # Looking at the `data` subdirectory 
