@@ -106,7 +106,7 @@ ba_blocks<- la_blocks %>%
 ba_subdivisions <- county_subdivisions("LA", county = c("033", "121"))
 ```
 
-```{r}
+```{r, fig.width = 4.5, fig.height=4.5}
 ggplot() +
   geom_sf(data = ba_subdivisions, fill = NA, color = "black", size = 0.7) + #subdivisions
   geom_sf(data = ba_tracts, fill = "white", color = "gray", size = 0.3) + #tracts
@@ -120,7 +120,7 @@ ggplot() +
 Now that I have a basemap, I can look into adding some homicide info. 
 The first map is going to just show the locations of each homicide. 
 
-```{r}
+```{r, fig.width = 4.5, fig.height=4.5}
 ggplot() +
   geom_sf(data = ba_subdivisions, fill = NA, color = "black", size = 0.7) + #subdivisions
   geom_sf(data = ba_tracts, fill = "white", color = "gray60", size = 0.3) + #tracts
